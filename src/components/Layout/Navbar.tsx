@@ -17,7 +17,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 w-full bg-gray-900 text-white p-4 z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         {/* Brand / Logo */}
-        <h1 className="text-xl font-bold text-teal-400">Brandon Jones</h1>
+        <h1 className="text-xl font-bold text-teal-400">Software Engeering Portfolio</h1>
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex gap-8">

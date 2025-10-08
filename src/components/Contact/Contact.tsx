@@ -1,97 +1,109 @@
-import { useRef, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import emailjs from "@emailjs/browser";
 
-const Contact = () => {
-  const formRef = useRef<HTMLFormElement>(null);
-  const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const Contact: React.FC = () => {
+  const [status, setStatus] = useState<string | null>(null);
 
-  const sendEmail = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
     try {
-      await emailjs.sendForm(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_q1i6coa",
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_07aots8",
-        formRef.current!,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "qviSdwyUkhbA2k3yq"
-      );
-      setSent(true);
-    } catch (err) {
-      console.error("EmailJS Error:", err);
-      setError("Failed to send. Please try again later.");
-    } finally {
-      setLoading(false);
+      const response = await fetch("https://formspree.io/f/mjkaepzy", {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      });
+
+      if (response.ok) {
+        setStatus("SUCCESS");
+        form.reset();
+      } else {
+        setStatus("ERROR");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus("ERROR");
     }
   };
 
   return (
-    <section id="contact" className="bg-gray-950 text-white py-20 px-6">
-      <div className="max-w-4xl mx-auto text-center">
+    <section id="contact" className="py-20 bg-gradient-to-b from-black to-gray-900 text-white">
+      <div className="container mx-auto px-6 max-w-2xl">
         <motion.h2
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl font-bold mb-8"
+          viewport={{ once: true }}
+          className="text-4xl font-bold text-center mb-12"
         >
           Contact Me
         </motion.h2>
 
-        {!sent ? (
-          <motion.form
-            ref={formRef}
-            onSubmit={sendEmail}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col space-y-4 bg-gray-900 p-8 rounded-2xl shadow-xl"
-          >
+        <form
+          onSubmit={handleSubmit}
+          className="bg-gray-800 p-8 rounded-2xl shadow-lg space-y-6"
+        >
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium mb-2">
+              Name
+            </label>
             <input
-              required
+              id="name"
+              name="name"
               type="text"
-              name="user_name"
-              placeholder="Your Name"
-              className="p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:border-blue-500"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium mb-2">
+              Email
+            </label>
             <input
-              required
+              id="email"
+              name="email"
               type="email"
-              name="user_email"
-              placeholder="Your Email"
-              className="p-3 rounded-md bg-gray-800 border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-            <textarea
               required
-              name="message"
-              placeholder="Your Message"
-              className="p-3 rounded-md bg-gray-800 border border-gray-700 h-40 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
             />
-            <button
-              type="submit"
-              disabled={loading}
-              className={`py-3 rounded-md font-semibold ${
-                loading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 transition"
-              }`}
-            >
-              {loading ? "Sending..." : "Send Message"}
-            </button>
-            {error && <p className="text-red-400 mt-2">{error}</p>}
-          </motion.form>
-        ) : (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-green-400 text-lg mt-8"
+          </div>
+
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium mb-2">
+              Message
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows={5}
+              required
+              className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+            ></textarea>
+          </div>
+
+          <motion.button
+            type="submit"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-full bg-teal-500 hover:bg-teal-600 transition-colors py-3 rounded-lg font-semibold text-lg"
           >
-            ✅ Thank you! Your message has been sent successfully.
-          </motion.p>
-        )}
+            Send Message
+          </motion.button>
+
+          {status === "SUCCESS" && (
+            <p className="text-green-400 text-center mt-4">
+              ✅ Message sent successfully!
+            </p>
+          )}
+          {status === "ERROR" && (
+            <p className="text-red-400 text-center mt-4">
+              ❌ Something went wrong. Please try again.
+            </p>
+          )}
+        </form>
       </div>
     </section>
   );
