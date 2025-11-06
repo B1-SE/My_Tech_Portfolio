@@ -7,7 +7,7 @@ const About = () => (
       </p>
       {/* ✅ Resume Button */}
         <a
-          href="/Brandon_Jones_Resume.pdf"
+          href="/Main_SE_Resume_.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block px-6 py-3 mt-4 bg-teal-500 text-white font-semibold rounded-lg shadow hover:bg-teal-600 transition"
